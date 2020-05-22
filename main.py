@@ -12,6 +12,7 @@ def voice_recording():
     sounddevice.wait()
     a = scipy.io.wavfile.write("out.wav",fs,record_voice)
     print("finished.........")
+
 def main():
     st.title('Alpha Ai Solution')
     st.subheader('Cough Detection Web Application')
