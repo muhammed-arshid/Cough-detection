@@ -3,13 +3,14 @@ import joblib,os
 import sounddevice
 import scipy
 from scipy.io.wavfile import write
+
 def voice_recording():
     fs = 44100
     sec = 10
     print("recording...")
-    recod_voic = sounddevice.rec(int(sec *fs),samplerate=fs,channels=2)
+    record_voice = sounddevice.rec(int(sec *fs),samplerate=fs,channels=2)
     sounddevice.wait()
-    a = scipy.io.wavfile.write("out.wav",fs,rec_voic)
+    a = scipy.io.wavfile.write("out.wav",fs,record_voice)
     print("finished.........")
 def main():
     st.title('Alpha Ai Solution')
