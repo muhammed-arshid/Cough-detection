@@ -2,4 +2,4 @@
 
 
 
-our first project :-Based on browser based web application
+our first project :-Based on browser based web pneumonia.AI application
