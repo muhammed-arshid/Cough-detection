@@ -70,7 +70,7 @@ def main():
                     else:
                         res  = predictSound(np.array(audio_buffer))
                         if res == '':
-                               webbrowser.open('http://google.co.kr', new=2) #create a external page and frre host pass that url into heare
+                               webbrowser.open('http://coughdetect.c1.biz/', new=2) #create a external page and frre host pass that url into heare
                         audio_buffer = []
                         near
 
