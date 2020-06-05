@@ -69,9 +69,8 @@ def main():
                         near += 1
                     else:
                         res  = predictSound(np.array(audio_buffer))
-                        if res == '' :
-                            import webbrowser
-                                webbrowser.open('http://google.co.kr', new=2) #create a external page and frre host pass that url into heare
+                        if res == '':
+                               webbrowser.open('http://google.co.kr', new=2) #create a external page and frre host pass that url into heare
                         audio_buffer = []
                         near
 
