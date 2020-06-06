@@ -24,9 +24,7 @@ def load_model():
 
 
 def predictSound(X):
-    sr = 22050
-    y  = X
-    print(y)
+    y, sr= librosa.load(x)
     spect = librosa.feature.melspectrogram(y=y, sr=sr,n_fft=2048, hop_length=512)
     spect = librosa.power_to_db(spect, ref=np.max)
     model1 = load_model()
