@@ -12,7 +12,7 @@ import pyaudio
 import webbrowser 
 
 def load_model():
-    model_name = "/home/arshid/Desktop/pro/updated_model"
+    model_name = "https://github.com/muhammed-arshid/Cough-detection/blob/master/updated_model.h5"
 
     # Model reconstruction from JSON file
     with open( model_name + '.json', 'r') as f:
