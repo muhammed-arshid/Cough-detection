@@ -73,10 +73,10 @@ def main():
                         if res == 1 :#expected output to give condition
                             webbrowser.open('http://coughdetect.c1.biz/', new=2) #create a external page and frre host pass that url into heare
                         audio_buffer = []
-                        near
+                        
 
         # close stream
-        stream.stop_stream()
+       
         stream.close()
         p.terminate()
 
