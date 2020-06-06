@@ -12,8 +12,6 @@ import pyaudio
 import webbrowser 
 
 def load_model():
-    lb = LabelEncoder()
-    lb.fit_transform([0,1])
     model_name = "/home/arshid/Desktop/pro/updated_model"
 
     # Model reconstruction from JSON file
