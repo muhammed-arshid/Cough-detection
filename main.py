@@ -12,11 +12,13 @@ import pyaudio
 import webbrowser 
 
 def load_model():
+    lb = LabelEncoder()
+    lb.fit_transform([0,1])
     model_name = "/home/arshid/Desktop/pro/updated_model"
 
-    # # Model reconstruction from JSON file
-    # with open( model_name + '.json', 'r') as f:
-    #     model = model_from_json(f.read())
+    # Model reconstruction from JSON file
+    with open( model_name + '.json', 'r') as f:
+        model = model_from_json(f.read())
 
     # Load weights into the new model
     model.load_weights( model_name + '.h5')
@@ -24,8 +26,15 @@ def load_model():
 
 
 def predictSound(X):
-    #Pre_Process code and prdictio code 
-    return val      #return values catogory
+    sr = 22050
+    y  = X
+    print(y)
+    spect = librosa.feature.melspectrogram(y=y, sr=sr,n_fft=2048, hop_length=512)
+    spect = librosa.power_to_db(spect, ref=np.max)
+    model1 = load_model()
+    res = model1.predict(np.array(spect))
+    return res
+
 def main():
     st.title('Alpha Ai Solution')
     st.subheader('Cough Detection Web Application')
@@ -34,11 +43,6 @@ def main():
     status = st.radio("Activate the App",("Start","Stop"))
     if status == "Start" :
         st.success("its Activated")
-
-
-
-
-
         CHUNKSIZE = 22050 # fixed chunk size
         RATE = 22050
 
@@ -48,8 +52,8 @@ def main():
 
         #noise window
         data = stream.read(4000)
-        noise_sample = np.frombuffer(data, dtype=np.float32)
-        loud_threshold = np.mean(np.abs(noise_sample)) * 10
+        # noise_sample = np.frombuffer(data, dtype=np.float32)
+        # loud_threshold = np.mean(np.abs(noise_sample)) * 10
         audio_buffer = []
         near = 0
 
@@ -57,7 +61,7 @@ def main():
             # Read chunk and load it into numpy array.
             data = stream.read(CHUNKSIZE)
             current_window = np.frombuffer(data, dtype=np.float32)
-            
+            noise_sample = np.frombuffer(data, dtype=np.float32)
             #Reduce noise real-time
             current_window = nr.reduce_noise(audio_clip=current_window, noise_clip=noise_sample, verbose=False)
             
@@ -69,8 +73,9 @@ def main():
                         near += 1
                     else:
                         res  = predictSound(np.array(audio_buffer))
-                        if res == '':
-                               webbrowser.open('http://coughdetect.c1.biz/', new=2) #create a external page and frre host pass that url into heare
+                        st.write(res)
+                        if res == 1 :#expected output to give condition
+                            webbrowser.open('http://coughdetect.c1.biz/', new=2) #create a external page and frre host pass that url into heare
                         audio_buffer = []
                         near
 
@@ -81,18 +86,6 @@ def main():
 
         # voice_recording()
     if status == "Stop":
-        
-        
-        
-
-   
-
-
-
-
-
-
-
-        
+        st.error("Stoped")
 if __name__ == "__main__":
     main()
