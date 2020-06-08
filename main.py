@@ -28,7 +28,7 @@ def load_model():
 def predictSound(X):
     y, sr = librosa.load(X)
     noisy_part = y[10000:]
-    reduced_noise = nr.reduce_noise(audio_clip=y, noise_clip=noisy_part, verbose=False)
+    reduced_noise = nr.reduce_noise(audio_clip=y, noise_clip=noisy_part, verbose=False)  # this line is not using in model so we are getting issue
     spect = librosa.feature.melspectrogram(y=y, sr=sr,n_fft=2048, hop_length=512)
     spect = librosa.power_to_db(spect, ref=np.max)
     spect = np.expand_dims(spect, axis = -1)
@@ -45,7 +45,7 @@ def main():
     st.title('Alpha Ai Solution')
     st.subheader('Cough Detection Web Application')
     activites = ["Members","mem 1","mem 1","mem 1","mem 1"]
-    choice = st.sidebar.selectbox("Alpha Team",activites)
+    choice = st.sidebar.selectbox("Alpha Team",activites)             # i  think this is also not works
     status = st.radio("Activate the App",("Start","Stop"))
     if status == "Start" :
         st.success("its Activated")
@@ -69,7 +69,7 @@ def main():
             waveFile.setframerate(RATE)
             waveFile.writeframes(b''.join(frames))
             waveFile.close()
-            file1 = '/home/arshid/Desktop/pro/file.wav'
+            file1 = '/home/arshid/Desktop/pro/file.wav'   #where to store for other pc
             res  = predictSound(file1)
             print(res)
             if res[0][0] == 1 :#expected output to give condition
