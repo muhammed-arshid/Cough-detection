@@ -2,35 +2,45 @@ import streamlit as st
 import joblib,os
 import numpy as np
 import librosa
-import matplotlib.pyplot as plt
 import noisereduce as nr
 from tensorflow.keras.models import model_from_json
-from sklearn.preprocessing import LabelEncoder
-import IPython
-import os
 import pyaudio
-import webbrowser 
+import webbrowser
+import wave 
 
+
+#error
+@st.cache(allow_output_mutation=True)
 def load_model():
-    model_name = "https://github.com/muhammed-arshid/Cough-detection/blob/master/updated_model.h5"
-
+    model_name = "/home/arshid/Desktop/pro/updated_model"
+    
     # Model reconstruction from JSON file
     with open( model_name + '.json', 'r') as f:
         model = model_from_json(f.read())
-
     # Load weights into the new model
     model.load_weights( model_name + '.h5')
     return model
 
+#error
+
+
 
 def predictSound(X):
-    y, sr= librosa.load(x)
+    y, sr = librosa.load(X)
+    noisy_part = y[10000:]
+    reduced_noise = nr.reduce_noise(audio_clip=y, noise_clip=noisy_part, verbose=False)
     spect = librosa.feature.melspectrogram(y=y, sr=sr,n_fft=2048, hop_length=512)
     spect = librosa.power_to_db(spect, ref=np.max)
+    spect = np.expand_dims(spect, axis = -1)
+    spect = np.expand_dims(spect, axis = 0)
+
+    #err0r
     model1 = load_model()
     res = model1.predict(np.array(spect))
-    return res
+    res = np.round(res)
+    #error
 
+    return res
 def main():
     st.title('Alpha Ai Solution')
     st.subheader('Cough Detection Web Application')
@@ -39,47 +49,35 @@ def main():
     status = st.radio("Activate the App",("Start","Stop"))
     if status == "Start" :
         st.success("its Activated")
-        CHUNKSIZE = 22050 # fixed chunk size
-        RATE = 22050
-
-        # initialize portaudio
-        p = pyaudio.PyAudio()
-        stream = p.open(format=pyaudio.paFloat32, channels=1, rate=RATE, input=True, frames_per_buffer=CHUNKSIZE)
-
-        #noise window
-        data = stream.read(4000)
-        # noise_sample = np.frombuffer(data, dtype=np.float32)
-        # loud_threshold = np.mean(np.abs(noise_sample)) * 10
-        audio_buffer = []
-        near = 0
-
+              
         while(True):
-            # Read chunk and load it into numpy array.
-            data = stream.read(CHUNKSIZE)
-            current_window = np.frombuffer(data, dtype=np.float32)
-            noise_sample = np.frombuffer(data, dtype=np.float32)
-            #Reduce noise real-time
-            current_window = nr.reduce_noise(audio_clip=current_window, noise_clip=noise_sample, verbose=False)
-            
-            if(audio_buffer==[]):
-                audio_buffer = current_window
-            else:
-                    if(near<4):
-                        audio_buffer = np.concatenate((audio_buffer,current_window))
-                        near += 1
-                    else:
-                        res  = predictSound(np.array(audio_buffer))
-                        st.write(res)
-                        if res == 1 :#expected output to give condition
-                            webbrowser.open('http://coughdetect.c1.biz/', new=2) #create a external page and frre host pass that url into heare
-                        audio_buffer = []
-                        
-
-        # close stream
-       
-        stream.close()
-        p.terminate()
-
+            FORMAT = pyaudio.paFloat32
+            CHANNELS = 2
+            RATE = 22050
+            CHUNK = 1024
+            RECORD_SECONDS = 4
+            WAVE_OUTPUT_FILENAME = "file.wav"
+            p = pyaudio.PyAudio()
+            stream = p.open(format=pyaudio.paFloat32, channels=2, rate=RATE, input=True, frames_per_buffer=CHUNK)
+            frames = []
+            for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+                data = stream.read(CHUNK)
+                frames.append(data)
+            waveFile = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+            waveFile.setnchannels(CHANNELS)
+            waveFile.setsampwidth(p.get_sample_size(FORMAT))
+            waveFile.setframerate(RATE)
+            waveFile.writeframes(b''.join(frames))
+            waveFile.close()
+            file1 = '/home/arshid/Desktop/pro/file.wav'
+            res  = predictSound(file1)
+            print(res)
+            if res[0][0] == 1 :#expected output to give condition
+                webbrowser.open('http://coughdetect.c1.biz/', new=2)
+        
+            stream.stop_stream()
+            stream.close()
+            p.terminate()
         # voice_recording()
     if status == "Stop":
         st.error("Stoped")
