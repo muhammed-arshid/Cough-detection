@@ -1,13 +1,13 @@
 import streamlit as st
-import joblib,os
 import numpy as np
 import librosa
 import noisereduce as nr
-from tensorflow.keras.models import load_model
-from tensorflow.keras import backend as K
+from keras.models import load_model
+from keras import backend as K
 import pyaudio
 import webbrowser
 import wave 
+import keras
 
 def predictSound(X):
     y, sr = librosa.load(X)
@@ -17,29 +17,27 @@ def predictSound(X):
     spect = librosa.power_to_db(spect, ref=np.max)
     spect = np.expand_dims(spect, axis = -1)
     spect = np.expand_dims(spect, axis = 0)
-    return np.array(spect)
-def model1():
-    model_weights_path = "./weights1.h5"
-    model_path = "./model.h5"
-    model = load_model(model_path)
-    model.load_weights(model_weights_path)
-    return model
+    model1 = load_model()
+    res = model1.predict(np.array(spect))
+    return res
+def load_model():
+    loaded = keras.models.load_model('./updated_model.h5')
+    return loaded
 if __name__ == "__main__":
     st.title("Alpha Ai Solution")
     st.subheader("Cough Detection Web Application")
-    activites = ["Members","mem 1","mem 1","mem 1","mem 1"]
+    activites = ["Members","Chirag","Garima","Arshid","Ritik"]
     choice = st.sidebar.selectbox("Alpha Team",activites)
     status = st.radio("Activate the App",("Start","Stop"))
     if status == "Start" :
         st.success("its Activated")
-        t = True
-        while(t):
+        while(True):
             FORMAT = pyaudio.paFloat32
             CHANNELS = 2
             RATE = 22050
             CHUNK = 1024
             RECORD_SECONDS = 4
-            WAVE_OUTPUT_FILENAME = "file.wav"
+            WAVE_OUTPUT_FILENAME = "./file.wav"
             p = pyaudio.PyAudio()
             stream = p.open(format=pyaudio.paFloat32, channels=2, rate=RATE, input=True, frames_per_buffer=CHUNK)
             frames = []
@@ -54,12 +52,10 @@ if __name__ == "__main__":
             waveFile.close()
             file1 = './file.wav'
             res  = predictSound(file1)
-            model =model1()
-            predictions = np.round(model.predict(res))
-            print(predictions)
-            if predictions[0][0] == 1 :#expected output to give condition
+            if res[0][1] >= 0.5 :
+                #expected output to give condition
                 webbrowser.open('http://coughdetect.c1.biz/', new=2)
-                t = False
+                break
             stream.stop_stream()
             stream.close()
             p.terminate()
