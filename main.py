@@ -30,7 +30,7 @@ if __name__ == "__main__":
     activites = ["Members","Chirag","Garima","Arshid","Ritik"]
     choice = st.sidebar.selectbox("Alpha Team",activites)
     status = st.radio("Activate the App",("Start","Stop"))
-    model = keras.models.load_model('./updated_model.h5')
+    model = keras.models.load_model('./final_model2.h5')
     if status == "Start" :
         st.success("its Activated")
         while(True):
